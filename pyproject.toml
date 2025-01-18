@@ -1,0 +1,15 @@
+[project]
+name = "reactor"
+description = "The Fast and Simple Face Swap Extension Node for ComfyUI, based on ReActor SD-WebUI Face Swap Extension"
+version = "1.0.0"
+license = {file = "LICENSE"}
+dependencies = ["albumentations>=1.4.16", "insightface==0.7.3", "onnx>=1.14.0", "opencv-python>=4.7.0.72", "numpy==1.26.3", "segment_anything", "ultralytics"]
+
+[project.urls]
+Repository = "https://github.com/Gourieff/ComfyUI-ReActor"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = ""
+DisplayName = "ComfyUI-ReActor"
+Icon = ""
