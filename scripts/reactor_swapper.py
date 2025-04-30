@@ -2,6 +2,8 @@ import os
 import shutil
 from typing import List, Union
 
+import onnxruntime
+
 import cv2
 import numpy as np
 from PIL import Image
@@ -461,6 +463,12 @@ def swap_face_many(
             logger.error("Cannot detect any Source")
 
         if source_faces is not None:
+
+                # Log if GPU is available for onnxruntime
+            if 'CUDAExecutionProvider' in onnxruntime.get_available_providers():
+                logger.status("Using onnxruntime-gpu")
+            else:
+                logger.status("Using onnxruntime (CPU)")
 
             target_faces = []
             for i, target_img in enumerate(target_imgs):
