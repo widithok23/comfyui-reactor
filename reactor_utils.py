@@ -14,6 +14,7 @@ import urllib.request
 import onnxruntime
 from typing import Any
 import folder_paths
+from scripts.reactor_logger import logger
 
 ORT_SESSION = None
 
@@ -185,6 +186,12 @@ def get_ort_session():
 
 def set_ort_session(model_path, providers) -> Any:
     global ORT_SESSION
+    # Log if GPU is available for onnxruntime
+    if 'CUDAExecutionProvider' in onnxruntime.get_available_providers():
+        logger.status("Using onnxruntime-gpu")
+    else:
+        logger.status("Using onnxruntime (CPU)")
+
     onnxruntime.set_default_logger_severity(3)
     ORT_SESSION = onnxruntime.InferenceSession(model_path, providers=providers)
     return ORT_SESSION
