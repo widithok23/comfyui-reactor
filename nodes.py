@@ -361,7 +361,7 @@ class reactor:
         if os.path.exists(tmp_img):
             os.remove(tmp_img)
         pil_images = pil_images_sfw
-        # #
+        # # #
 
         if len(pil_images) > 0:
 
