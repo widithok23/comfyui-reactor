@@ -14,7 +14,6 @@ import urllib.request
 import onnxruntime
 from typing import Any
 import folder_paths
-from scripts.reactor_logger import logger
 
 ORT_SESSION = None
 
