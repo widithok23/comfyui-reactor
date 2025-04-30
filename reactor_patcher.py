@@ -66,6 +66,13 @@ def patched_get_model(self, **kwargs):
 def patched_faceanalysis_init(self, name=DEFAULT_MP_NAME, root='~/.insightface', allowed_modules=None, **kwargs):
     onnxruntime.set_default_logger_severity(3)
     self.models = {}
+    
+    # Log if GPU is available for onnxruntime
+    if 'CUDAExecutionProvider' in onnxruntime.get_available_providers():
+        logger.info("Using onnxruntime-gpu")
+    else:
+        logger.info("Using onnxruntime (CPU)")
+        
     self.model_dir = ensure_available('models', name, root=root)
     onnx_files = glob.glob(osp.join(self.model_dir, '*.onnx'))
     onnx_files = sorted(onnx_files)
