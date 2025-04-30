@@ -2,8 +2,6 @@ import os
 import shutil
 from typing import List, Union
 
-import onnxruntime
-
 import cv2
 import numpy as np
 from PIL import Image
@@ -274,12 +272,6 @@ def swap_face(
             logger.info("Source Image the Same? %s", source_image_same)
 
             if SOURCE_FACES is None or not source_image_same:
-                # Log if GPU is available for onnxruntime
-                if 'CUDAExecutionProvider' in onnxruntime.get_available_providers():
-                    logger.status(f"Using onnxruntime-gpu")
-                else:
-                    logger.status(f"Using onnxruntime (CPU)")
-
                 logger.status("Analyzing Source Image...")
                 source_faces = analyze_faces(source_img)
                 SOURCE_FACES = source_faces
