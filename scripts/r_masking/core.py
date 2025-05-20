@@ -312,15 +312,24 @@ class SafeToGPU:
         if is_same_device(device, 'cpu'):
             obj.to(device)
         else:
-            if is_same_device(obj.device, 'cpu'):  # cpu to gpu
+            # TRY to check submodule device
+            current_device = None
+            try:
+                current_device = next(obj.parameters()).device
+            except:
+                pass
+
+            if current_device is None or is_same_device(current_device, 'cpu'):
                 model_management.free_memory(self.size * 1.3, device)
                 if model_management.get_free_memory(device) > self.size * 1.3:
                     try:
+                        print("Moving to GPU...", end=" ")
                         obj.to(device)
+                        print("OK")
                     except:
-                        print(f"WARN: The model is not moved to the '{device}' due to insufficient memory. [1]")
+                        print(f"Failed\nWARN: Model not moved to '{device}' [1]")
                 else:
-                    print(f"WARN: The model is not moved to the '{device}' due to insufficient memory. [2]")
+                    print(f"WARN: Model not moved to '{device}' [2]")
 
 def center_of_bbox(bbox):
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
@@ -532,9 +541,10 @@ def merge_and_stack_masks(stacked_masks, group_size):
 
 def make_sam_mask_segmented(sam_model, segs, image, detection_hint, dilation,
                             threshold, bbox_expansion, mask_hint_threshold, mask_hint_use_negative):
-    if sam_model.is_auto_mode:
+    if getattr(sam_model, 'is_auto_mode', False):
         device = model_management.get_torch_device()
-        sam_model.safe_to.to_device(sam_model, device=device)
+        # sam_model.safe_to.to_device(sam_model, device=device)
+        sam_model.to(device)
 
     try:
         predictor = SamPredictor(sam_model)
@@ -588,18 +598,29 @@ def make_sam_mask_segmented(sam_model, segs, image, detection_hint, dilation,
         mask = combine_masks2(total_masks)
 
     finally:
-        if sam_model.is_auto_mode:
-            sam_model.cpu()
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        sam_model.to(device)
+        # if sam_model.is_auto_mode:
+        #     sam_model.cpu()
 
         pass
 
-    mask_working_device = torch.device("cpu")
+    # mask_working_device = torch.device("cpu")
+    mask_working_device = model_management.get_torch_device()
 
     if mask is not None:
         mask = mask.float()
-        mask = dilate_mask(mask.cpu().numpy(), dilation)
-        mask = torch.from_numpy(mask)
-        mask = mask.to(device=mask_working_device)
+        # mask = dilate_mask(mask.cpu().numpy(), dilation)
+        # mask = torch.from_numpy(mask)
+        # mask = mask.to(device=mask_working_device)
+        mask = mask.unsqueeze(0).unsqueeze(0)  # [1,1,H,W]
+        if dilation > 0:
+            kernel_size = 1 + dilation * 2
+            mask = torch.nn.functional.max_pool2d(mask, kernel_size=kernel_size, stride=1, padding=dilation)
+        elif dilation < 0:
+            kernel_size = 1 + abs(dilation) * 2
+            mask = -torch.nn.functional.max_pool2d(-mask, kernel_size=kernel_size, stride=1, padding=abs(dilation))
+        mask = mask.squeeze(0).squeeze(0)  # [H,W]
     else:
         # Extracting batch, height and width
         height, width, _ = image.shape
@@ -641,7 +662,8 @@ def tensor2rgba(t: torch.Tensor) -> torch.Tensor:
     elif size[3] == 1:
         return t.repeat(1, 1, 1, 4)
     elif size[3] == 3:
-        alpha_tensor = torch.ones((size[0], size[1], size[2], 1))
+        # alpha_tensor = torch.ones((size[0], size[1], size[2], 1)).to(t.device)
+        alpha_tensor = t.new_ones((size[0], size[1], size[2], 1))
         return torch.cat((t, alpha_tensor), dim=3)
     else:
         return t

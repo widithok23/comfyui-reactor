@@ -24,6 +24,34 @@ def tensor_to_pil(img_tensor, batch_index=0):
     img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8).squeeze())
     return img
 
+# def tensor_to_pil(img, batch_index=0):
+#     """Безопасное преобразование тензора в PIL.Image с обработкой особых случаев"""
+#     try:
+#         # Обработка пакетных данных
+#         if isinstance(img, torch.Tensor):
+#             if len(img.shape) == 4:
+#                 img = img[batch_index]  # Выбор элемента батча
+#             img = img.detach().cpu().numpy()
+        
+#         # Нормализация и приведение типа
+#         if img.dtype == np.float32:
+#             img = np.clip(255. * img, 0, 255).astype(np.uint8)
+        
+#         # Обработка нестандартных размерностей
+#         if img.shape[-1] > 4:  # Если каналов больше 4
+#             img = img[..., :3]  # Берем первые 3 канала
+        
+#         # Преобразование в 2D/3D массив
+#         if len(img.shape) == 3 and img.shape[0] == 1:  # [C, H, W] → [H, W]
+#             img = img.squeeze(0)
+#         elif len(img.shape) == 3 and img.shape[2] == 1:  # [H, W, C=1]
+#             img = img.squeeze(-1)
+        
+#         return Image.fromarray(img)
+    
+#     except Exception as e:
+#         raise RuntimeError(f"Невозможно преобразовать тензор формы {img.shape} в PIL.Image") from e
+
 
 def batch_tensor_to_pil(img_tensor):
     # Convert tensor of shape [batch_size, channels, height, width] to a list of PIL Images
