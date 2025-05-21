@@ -2,7 +2,7 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_EN.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/node_version-0.6.0_alpha1-lightgreen?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/node_version-0.6.0-brightgreen?style=for-the-badge&labelColor=darkgreen)
 
   <!--<sup>
   <font color=brightred>
@@ -51,7 +51,7 @@
 
 ## What's new in the latest update
 
-### 0.6.0 <sub><sup>ALPHA1</sup></sub>
+### 0.6.0
 
 - New Node `ReActorSetWeight` - you can now set the strength of face swap for `source_image` or `face_model` from 0% to 100% (in 12.5% step)
 
