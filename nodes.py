@@ -12,6 +12,7 @@ import cv2
 import math
 from typing import List
 from PIL import Image
+import io
 from scipy import stats
 from insightface.app.common import Face
 from segment_anything import sam_model_registry
@@ -50,7 +51,9 @@ from reactor_utils import (
     prepare_cropped_face,
     normalize_cropped_face,
     add_folder_path_and_extensions,
-    rgba2rgb_tensor
+    rgba2rgb_tensor,
+    progress_bar,
+    progress_bar_reset
 )
 from reactor_patcher import apply_patch
 from r_facelib.utils.face_restoration_helper import FaceRestoreHelper
@@ -153,7 +156,8 @@ class reactor:
             "hidden": {"faces_order": "FACES_ORDER"},
         }
 
-    RETURN_TYPES = ("IMAGE","FACE_MODEL")
+    RETURN_TYPES = ("IMAGE","FACE_MODEL","IMAGE")
+    RETURN_NAMES = ("SWAPPED_IMAGE","FACE_MODEL","ORIGINAL_IMAGE")
     FUNCTION = "execute"
     CATEGORY = "🌌 ReActor"
 
@@ -233,10 +237,12 @@ class reactor:
 
             out_images = []
 
+            pbar = progress_bar(total_images)
+
             for i in range(total_images):
 
                 if total_images > 1:
-                    logger.status(f"Restoring {i+1}")
+                    logger.status(f"Restoring {i}")
 
                 cur_image_np = image_np[i,:, :, ::-1]
 
@@ -311,15 +317,24 @@ class reactor:
                 if state.interrupted or model_management.processing_interrupted():
                     logger.status("Interrupted by User")
                     return input_image
+                
+                pbar.update(1)
 
             restored_img_np = np.array(out_images).astype(np.float32) / 255.0
             restored_img_tensor = torch.from_numpy(restored_img_np)
 
             result = restored_img_tensor
 
+            progress_bar_reset(pbar)
+
         return result
 
     def execute(self, enabled, input_image, swap_model, detect_gender_source, detect_gender_input, source_faces_index, input_faces_index, console_log_level, face_restore_model,face_restore_visibility, codeformer_weight, facedetection, source_image=None, face_model=None, faces_order=None, face_boost=None):
+
+        device = model_management.get_torch_device()
+
+        if isinstance(input_image, torch.Tensor) and input_image.device != device:
+            input_image = input_image.to(device)
 
         if face_boost is not None:
             self.face_boost_enabled = face_boost["enabled"]
@@ -349,20 +364,21 @@ class reactor:
         pil_images = batch_tensor_to_pil(input_image)
 
         # NSFW checker
-        logger.status("Checking for any unsafe content")
+        pbar = progress_bar(len(pil_images))
         pil_images_sfw = []
-        tmp_img = "reactor_tmp.png"
         for img in pil_images:
             if state.interrupted or model_management.processing_interrupted():
                 logger.status("Interrupted by User")
                 break
-            img.save(tmp_img)
-            if not sfw.nsfw_image(tmp_img, NSFWDET_MODEL_PATH):
+            img_byte_arr = io.BytesIO()
+            img.save(img_byte_arr, format='PNG')
+            img_byte_arr = img_byte_arr.getvalue()
+            if not sfw.nsfw_image(img_byte_arr, NSFWDET_MODEL_PATH):
                 pil_images_sfw.append(img)
-        if os.path.exists(tmp_img):
-            os.remove(tmp_img)
+            pbar.update(1)
         pil_images = pil_images_sfw
         # # #
+        progress_bar_reset(pbar)
 
         if len(pil_images) > 0:
 
@@ -392,6 +408,7 @@ class reactor:
                 interpolation=self.interpolation,
             )
             result = batched_pil_to_tensor(p.init_images)
+            original_image = batched_pil_to_tensor(pil_images)
 
             if face_model is None:
                 current_face_model = get_current_faces_model()
@@ -406,8 +423,9 @@ class reactor:
             image_black = Image.new("RGB", (512, 512))
             result = batched_pil_to_tensor([image_black])
             face_model_to_provide = None
+            original_image = result
 
-        return (result,face_model_to_provide)
+        return (result,face_model_to_provide,original_image)
 
 
 class ReActorPlusOpt:
@@ -431,7 +449,8 @@ class ReActorPlusOpt:
             }
         }
 
-    RETURN_TYPES = ("IMAGE","FACE_MODEL")
+    RETURN_TYPES = ("IMAGE","FACE_MODEL","IMAGE")
+    RETURN_NAMES = ("SWAPPED_IMAGE","FACE_MODEL","ORIGINAL_IMAGE")
     FUNCTION = "execute"
     CATEGORY = "🌌 ReActor"
 

@@ -14,6 +14,7 @@ import urllib.request
 import onnxruntime
 from typing import Any
 import folder_paths
+from comfy.utils import ProgressBar
 
 ORT_SESSION = None
 
@@ -234,6 +235,14 @@ def normalize_cropped_face(cropped_face):
 	cropped_face = (cropped_face * 255.0).round()
 	cropped_face = cropped_face.astype(np.uint8)[:, :, ::-1]
 	return cropped_face
+
+
+def progress_bar(total):
+    return ProgressBar(total)
+
+def progress_bar_reset(pbar):
+    pbar.current = 0
+    pbar.update(0)
 
 
 # author: Trung0246 --->
