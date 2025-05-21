@@ -51,6 +51,13 @@
 
 ## What's new in the latest update
 
+### 0.6.1 <sub><sup>BETA1</sup></sub>
+
+- MaskHelper node 2x speed up - not perfect yet but 1.5x-2x faster then before
+- ComfyUI native ProgressBar for different steps
+- ORIGINAL_IMAGE output for main nodes
+- Different fixes and improvements (https://github.com/Gourieff/ComfyUI-ReActor/issues/25 fix; no tmp file for NSFW detector; NSFW detector little speed up)
+
 ### 0.6.0
 
 - New Node `ReActorSetWeight` - you can now set the strength of face swap for `source_image` or `face_model` from 0% to 100% (in 12.5% step)
