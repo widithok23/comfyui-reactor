@@ -231,7 +231,8 @@ class reactor:
                 FACE_SIZE = faceSize
                 FACE_HELPER = self.face_helper
 
-            image_np = 255. * result.numpy()
+            # Copying Tensor to CPU (if it isn't) to convert torch.Tensor to np.ndarray
+            image_np = 255. * result.cpu().numpy()
 
             total_images = image_np.shape[0]
 
