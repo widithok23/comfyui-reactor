@@ -472,6 +472,11 @@ def swap_face_many(
             target_faces = []
             pbar = progress_bar(len(target_imgs))
 
+            if len(TARGET_IMAGE_LIST_HASH) > 0:
+                logger.status(f"Using Hashed Target Face(s) Model...")
+            else:
+                logger.status(f"Analyzing Target Image...")
+            
             for i, target_img in enumerate(target_imgs):
                 if state.interrupted or model_management.processing_interrupted():
                     logger.status("Interrupted by User")
@@ -493,19 +498,19 @@ def swap_face_many(
                 logger.info("(Image %s) Target Image the Same? %s", i, target_image_same)
 
                 if len(TARGET_FACES_LIST) == 0:
-                    logger.status(f"Analyzing Target Image {i}...")
+                    # logger.status(f"Analyzing Target Image {i}...")
                     target_face = analyze_faces(target_img)
                     TARGET_FACES_LIST = [target_face]
                 elif len(TARGET_FACES_LIST) == i and not target_image_same:
-                    logger.status(f"Analyzing Target Image {i}...")
+                    # logger.status(f"Analyzing Target Image {i}...")
                     target_face = analyze_faces(target_img)
                     TARGET_FACES_LIST.append(target_face)
                 elif len(TARGET_FACES_LIST) != i and not target_image_same:
-                    logger.status(f"Analyzing Target Image {i}...")
+                    # logger.status(f"Analyzing Target Image {i}...")
                     target_face = analyze_faces(target_img)
                     TARGET_FACES_LIST[i] = target_face
                 elif target_image_same:
-                    logger.status("(Image %s) Using Hashed Target Face(s) Model...", i)
+                    # logger.status("(Image %s) Using Hashed Target Face(s) Model...", i)
                     target_face = TARGET_FACES_LIST[i]
                 
 
@@ -554,11 +559,11 @@ def swap_face_many(
 
                     if source_face is not None and src_wrong_gender == 0:
                         # Reading results to make current face swap on a previous face result
+                        logger.status(f"Swapping...")
                         for i, (target_img, target_face) in enumerate(zip(results, target_faces)):
                             target_face_single, wrong_gender = get_face_single(target_img, target_face, face_index=face_num, gender_target=gender_target, order=faces_order[0])
                             if target_face_single is not None and wrong_gender == 0:
                                 result = target_img
-                                logger.status(f"Swapping {i}...")
                                 if face_boost_enabled:
                                     logger.status(f"Face Boost is enabled")
                                     bgr_fake, M = face_swapper.get(target_img, target_face_single, source_face, paste_back=False)

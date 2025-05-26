@@ -237,13 +237,13 @@ class reactor:
             total_images = image_np.shape[0]
 
             out_images = []
-
+            
             pbar = progress_bar(total_images)
 
             for i in range(total_images):
 
-                if total_images > 1:
-                    logger.status(f"Restoring {i}")
+                # if total_images > 1:
+                #     logger.status(f"Restoring {i}")
 
                 cur_image_np = image_np[i,:, :, ::-1]
 
@@ -365,6 +365,7 @@ class reactor:
         pil_images = batch_tensor_to_pil(input_image)
 
         # NSFW checker
+        logger.status("Checking for any unsafe content...")
         pbar = progress_bar(len(pil_images))
         pil_images_sfw = []
         for img in pil_images:

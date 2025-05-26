@@ -39,7 +39,6 @@ def nsfw_image(img_data, model_path: str):
         logger.status("Ensuring NSFW detection model exists...")
         if not ensure_nsfw_model(model_path):
             return True
-    logger.status("Checking for any unsafe content...")
     device = model_management.get_torch_device()
     with Image.open(io.BytesIO(img_data)) as img:
         if "cpu" in str(device):
