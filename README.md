@@ -2,7 +2,7 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_EN.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/node_version-0.6.1_beta1-green?style=for-the-badge&labelColor=darkgreen)
+  ![Version](https://img.shields.io/badge/node_version-0.6.1_beta2-green?style=for-the-badge&labelColor=darkgreen)
 
   <!--<sup>
   <font color=brightred>
@@ -51,7 +51,7 @@
 
 ## What's new in the latest update
 
-### 0.6.1 <sub><sup>BETA1</sup></sub>
+### 0.6.1 <sub><sup>BETA1, BETA2</sup></sub>
 
 - MaskHelper node 2x speed up - not perfect yet but 1.5x-2x faster then before
 - ComfyUI native ProgressBar for different steps
