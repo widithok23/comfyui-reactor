@@ -2,16 +2,16 @@
 
   <img src="https://github.com/Gourieff/Assets/raw/main/sd-webui-reactor/ReActor_logo_NEW_EN.png?raw=true" alt="logo" width="180px"/>
 
-  ![Version](https://img.shields.io/badge/node_version-0.6.1_beta2-green?style=for-the-badge&labelColor=darkgreen)
+![Version](https://img.shields.io/badge/node_version-0.6.1_beta2-green?style=for-the-badge&labelColor=darkgreen)
 
   <!--<sup>
   <font color=brightred>
 
   ## !!! [Important Update](#latestupdate) !!!<br>Don't forget to add the Node again in existing workflows
-  
+
   </font>
   </sup>-->
-  
+
   <a href="https://boosty.to/artgourieff" target="_blank">
     <img src="https://lovemet.ru/img/boosty.jpg" width="108" alt="Support Me on Boosty"/>
     <br>
@@ -21,16 +21,22 @@
   </a>
 
   <hr>
-  
-  [![Commit activity](https://img.shields.io/github/commit-activity/t/Gourieff/ComfyUI-ReActor/main?cacheSeconds=0)](https://github.com/Gourieff/ComfyUI-ReActor/commits/main)
-  ![Last commit](https://img.shields.io/github/last-commit/Gourieff/ComfyUI-ReActor/main?cacheSeconds=0)
-  [![Opened issues](https://img.shields.io/github/issues/Gourieff/ComfyUI-ReActor?color=red)](https://github.com/Gourieff/ComfyUI-ReActor/issues?cacheSeconds=0)
-  [![Closed issues](https://img.shields.io/github/issues-closed/Gourieff/ComfyUI-ReActor?color=green&cacheSeconds=0)](https://github.com/Gourieff/ComfyUI-ReActor/issues?q=is%3Aissue+state%3Aclosed)
-  ![License](https://img.shields.io/github/license/Gourieff/ComfyUI-ReActor)
 
-  English | [Русский](/README_RU.md)
+[![Commit activity](https://img.shields.io/github/commit-activity/t/Gourieff/ComfyUI-ReActor/main?cacheSeconds=0)](https://github.com/Gourieff/ComfyUI-ReActor/commits/main)
+![Last commit](https://img.shields.io/github/last-commit/Gourieff/ComfyUI-ReActor/main?cacheSeconds=0)
+[![Opened issues](https://img.shields.io/github/issues/Gourieff/ComfyUI-ReActor?color=red)](https://github.com/Gourieff/ComfyUI-ReActor/issues?cacheSeconds=0)
+[![Closed issues](https://img.shields.io/github/issues-closed/Gourieff/ComfyUI-ReActor?color=green&cacheSeconds=0)](https://github.com/Gourieff/ComfyUI-ReActor/issues?q=is%3Aissue+state%3Aclosed)
+![License](https://img.shields.io/github/license/Gourieff/ComfyUI-ReActor)
+
+English | [Русский](/README_RU.md)
 
 # ReActor Nodes for ComfyUI<br><sub><sup>-=SFW-Friendly=-</sup></sub>
+
+# 🚀 Why is this fork awesome? 🚀
+
+### 🔥 This fork keeps all the magic of the original ComfyUI-ReActor but puts YOU in control! Now, you get to set your own detection threshold. The default is still a safe and sound 96% (super work-friendly and fully Github-compliant) — but if you want to tweak it, the power is in your hands! 💪✨
+
+---
 
 </div>
 
@@ -41,6 +47,7 @@
 <div align="center">
 
 ---
+
 [**What's new**](#latestupdate) | [**Installation**](#installation) | [**Usage**](#usage) | [**Troubleshooting**](#troubleshooting) | [**Updating**](#updating) | [**Disclaimer**](#disclaimer) | [**Credits**](#credits) | [**Note!**](#note)
 
 ---
@@ -97,7 +104,6 @@ Just put them into the "models/reswapper" directory.
 </center>
 
 - Fixes and improvements
-
 
 ### 0.5.1
 
@@ -230,15 +236,15 @@ Thanks to everyone who finds bugs, suggests new features and supports this proje
 6. `python -m pip install -U pip`
 7. `cd extensions\sd-webui-comfyui\ComfyUI\custom_nodes\ComfyUI-ReActor`
 8. `python install.py`
-9.  Please, wait until the installation process will be finished
+9. Please, wait until the installation process will be finished
 10. (From the version 0.3.0) Download additional facerestorers models from the link below and put them into the `extensions\sd-webui-comfyui\ComfyUI\models\facerestore_models` directory:<br>
-https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models/facerestore_models
+    https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models/facerestore_models
 11. Run SD WebUI and check console for the message that ReActor Node is running:
-<img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/uploads/console_status_running.jpg?raw=true" alt="console_status_running" width="759"/>
+    <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/uploads/console_status_running.jpg?raw=true" alt="console_status_running" width="759"/>
 
-12.  Go to the ComfyUI tab and find there ReActor Node inside the menu `ReActor` or by using a search:
-<img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/uploads/webui-demo.png?raw=true" alt="webui-demo" width="100%"/>
-<img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/uploads/search-demo.png?raw=true" alt="webui-demo" width="1043"/>
+12. Go to the ComfyUI tab and find there ReActor Node inside the menu `ReActor` or by using a search:
+    <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/uploads/webui-demo.png?raw=true" alt="webui-demo" width="100%"/>
+    <img src="https://github.com/Gourieff/Assets/blob/main/comfyui-reactor-node/uploads/search-demo.png?raw=true" alt="webui-demo" width="1043"/>
 
 </details>
 
@@ -263,12 +269,13 @@ https://huggingface.co/datasets/Gourieff/ReActor/tree/main/models/facerestore_mo
 You can find ReActor Nodes inside the menu `ReActor` or by using a search (just type "ReActor" in the search field)
 
 List of Nodes:
+
 - ••• Main Nodes •••
-   - ReActorFaceSwap (Main Node)
-   - ReActorFaceSwapOpt (Main Node with the additional Options input)
-   - ReActorOptions (Options for ReActorFaceSwapOpt)
-   - ReActorFaceBoost (Face Booster Node)
-   - ReActorMaskHelper (Masking Helper)
+  - ReActorFaceSwap (Main Node)
+  - ReActorFaceSwapOpt (Main Node with the additional Options input)
+  - ReActorOptions (Options for ReActorFaceSwapOpt)
+  - ReActorFaceBoost (Face Booster Node)
+  - ReActorMaskHelper (Masking Helper)
 - ••• Operations with Face Models •••
   - ReActorSaveFaceModel (Save Face Model)
   - ReActorLoadFaceModel (Load Face Model)
@@ -399,6 +406,7 @@ The developers of this software are aware of its possible unethical applications
 Users of this software are expected to use this software responsibly while abiding the local law. If face of a real person is being used, users are suggested to get consent from the concerned person and clearly mention that it is a deepfake when posting content online. **Developers and Contributors of this software are not responsible for actions of end-users.**
 
 By using this extension you are agree not to create any content that:
+
 - violates any laws;
 - causes any harm to a person or persons;
 - propagates (spreads) any information (both public or personal) or images (both public or personal) which could be meant for harm;
@@ -418,6 +426,7 @@ Please note that if you intend to use this software for any commercial purposes,
 #### Safe-to-use models have the following hash:
 
 inswapper_128.onnx
+
 ```
 MD5:a3a155b90354160350efd66fed6b3d80
 SHA256:e4a3f08c753cb72d04e10aa0f7dbe3deebbf39567d4ead6dce08e98aa49e16af
@@ -469,14 +478,14 @@ SHA256:4c06341c33c2ca1f86781dab0e829f88ad5b64be9fba56e56bc9ebdefc619e43
 
 <br>
 
-|file|source|license|
-|----|------|-------|
-|[buffalo_l.zip](https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/buffalo_l.zip) | [DeepInsight](https://github.com/deepinsight/insightface) | ![license](https://img.shields.io/badge/license-non_commercial-red) |
-| [codeformer-v0.1.0.pth](https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/facerestore_models/codeformer-v0.1.0.pth) | [sczhou](https://github.com/sczhou/CodeFormer) | ![license](https://img.shields.io/badge/license-non_commercial-red) |
-| [GFPGANv1.3.pth](https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/facerestore_models/GFPGANv1.3.pth) | [TencentARC](https://github.com/TencentARC/GFPGAN) | ![license](https://img.shields.io/badge/license-Apache_2.0-green.svg) |
-| [GFPGANv1.4.pth](https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/facerestore_models/GFPGANv1.4.pth) | [TencentARC](https://github.com/TencentARC/GFPGAN) | ![license](https://img.shields.io/badge/license-Apache_2.0-green.svg) |
-| [inswapper_128.onnx](https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx) | [DeepInsight](https://github.com/deepinsight/insightface) | ![license](https://img.shields.io/badge/license-non_commercial-red) |
-| [inswapper_128_fp16.onnx](https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128_fp16.onnx) | [Hillobar](https://github.com/Hillobar/Rope) | ![license](https://img.shields.io/badge/license-non_commercial-red) |
+| file                                                                                                                                | source                                                    | license                                                               |
+| ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
+| [buffalo_l.zip](https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/buffalo_l.zip)                                    | [DeepInsight](https://github.com/deepinsight/insightface) | ![license](https://img.shields.io/badge/license-non_commercial-red)   |
+| [codeformer-v0.1.0.pth](https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/facerestore_models/codeformer-v0.1.0.pth) | [sczhou](https://github.com/sczhou/CodeFormer)            | ![license](https://img.shields.io/badge/license-non_commercial-red)   |
+| [GFPGANv1.3.pth](https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/facerestore_models/GFPGANv1.3.pth)               | [TencentARC](https://github.com/TencentARC/GFPGAN)        | ![license](https://img.shields.io/badge/license-Apache_2.0-green.svg) |
+| [GFPGANv1.4.pth](https://huggingface.co/datasets/Gourieff/ReActor/blob/main/models/facerestore_models/GFPGANv1.4.pth)               | [TencentARC](https://github.com/TencentARC/GFPGAN)        | ![license](https://img.shields.io/badge/license-Apache_2.0-green.svg) |
+| [inswapper_128.onnx](https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128.onnx)                   | [DeepInsight](https://github.com/deepinsight/insightface) | ![license](https://img.shields.io/badge/license-non_commercial-red)   |
+| [inswapper_128_fp16.onnx](https://github.com/facefusion/facefusion-assets/releases/download/models/inswapper_128_fp16.onnx)         | [Hillobar](https://github.com/Hillobar/Rope)              | ![license](https://img.shields.io/badge/license-non_commercial-red)   |
 
 [BasicSR](https://github.com/XPixelGroup/BasicSR) - [@XPixelGroup](https://github.com/XPixelGroup) <br>
 [facexlib](https://github.com/xinntao/facexlib) - [@xinntao](https://github.com/xinntao) <br>
