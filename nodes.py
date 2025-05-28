@@ -147,6 +147,7 @@ class reactor:
                 "input_faces_index": ("STRING", {"default": "0"}),
                 "source_faces_index": ("STRING", {"default": "0"}),
                 "console_log_level": ([0, 1, 2], {"default": 1}),
+                "nsfw_threshold": ("FLOAT", {"default": 0.96, "min": 0.0, "max": 1.0, "step": 0.01}),
             },
             "optional": {
                 "source_image": ("IMAGE",),
@@ -237,7 +238,7 @@ class reactor:
             total_images = image_np.shape[0]
 
             out_images = []
-            
+
             pbar = progress_bar(total_images)
 
             for i in range(total_images):
@@ -318,7 +319,7 @@ class reactor:
                 if state.interrupted or model_management.processing_interrupted():
                     logger.status("Interrupted by User")
                     return input_image
-                
+
                 pbar.update(1)
 
             restored_img_np = np.array(out_images).astype(np.float32) / 255.0
@@ -330,7 +331,7 @@ class reactor:
 
         return result
 
-    def execute(self, enabled, input_image, swap_model, detect_gender_source, detect_gender_input, source_faces_index, input_faces_index, console_log_level, face_restore_model,face_restore_visibility, codeformer_weight, facedetection, source_image=None, face_model=None, faces_order=None, face_boost=None):
+    def execute(self, enabled, input_image, swap_model, detect_gender_source, detect_gender_input, source_faces_index, input_faces_index, console_log_level, face_restore_model,face_restore_visibility, codeformer_weight, facedetection, nsfw_threshold, source_image=None, face_model=None, faces_order=None, face_boost=None):
 
         device = model_management.get_torch_device()
 
@@ -375,7 +376,7 @@ class reactor:
             img_byte_arr = io.BytesIO()
             img.save(img_byte_arr, format='PNG')
             img_byte_arr = img_byte_arr.getvalue()
-            if not sfw.nsfw_image(img_byte_arr, NSFWDET_MODEL_PATH):
+            if not sfw.nsfw_image(img_byte_arr, NSFWDET_MODEL_PATH, nsfw_threshold):
                 pil_images_sfw.append(img)
             pbar.update(1)
         pil_images = pil_images_sfw
@@ -442,6 +443,7 @@ class ReActorPlusOpt:
                 "face_restore_model": (get_model_names(get_restorers),),
                 "face_restore_visibility": ("FLOAT", {"default": 1, "min": 0.1, "max": 1, "step": 0.05}),
                 "codeformer_weight": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 1, "step": 0.05}),
+                "nsfw_threshold": ("FLOAT", {"default": 0.96, "min": 0.0, "max": 1.0, "step": 0.01}),
             },
             "optional": {
                 "source_image": ("IMAGE",),
@@ -472,7 +474,7 @@ class ReActorPlusOpt:
         self.boost_model_visibility = 1
         self.boost_cf_weight = 0.5
 
-    def execute(self, enabled, input_image, swap_model, facedetection, face_restore_model, face_restore_visibility, codeformer_weight, source_image=None, face_model=None, options=None, face_boost=None):
+    def execute(self, enabled, input_image, swap_model, facedetection, face_restore_model, face_restore_visibility, codeformer_weight, nsfw_threshold, source_image=None, face_model=None, options=None, face_boost=None):
 
         if options is not None:
             self.faces_order = [options["input_faces_order"], options["source_faces_order"]]
@@ -489,7 +491,7 @@ class ReActorPlusOpt:
             self.face_boost_enabled = False
 
         result = reactor.execute(
-            self,enabled,input_image,swap_model,self.detect_gender_source,self.detect_gender_input,self.source_faces_index,self.input_faces_index,self.console_log_level,face_restore_model,face_restore_visibility,codeformer_weight,facedetection,source_image,face_model,self.faces_order, face_boost=face_boost
+            self,enabled,input_image,swap_model,self.detect_gender_source,self.detect_gender_input,self.source_faces_index,self.input_faces_index,self.console_log_level,face_restore_model,face_restore_visibility,codeformer_weight,facedetection,nsfw_threshold,source_image,face_model,self.faces_order, face_boost=face_boost
         )
 
         return result
@@ -532,7 +534,7 @@ class ReActorWeight:
                 "face_model": ("FACE_MODEL",),
             }
         }
-    
+
     RETURN_TYPES = ("IMAGE","FACE_MODEL")
     RETURN_NAMES = ("INPUT_IMAGE","FACE_MODEL")
     FUNCTION = "set_weight"
@@ -546,7 +548,7 @@ class ReActorWeight:
         if input_image is None:
             logger.error("Please provide `input_image`")
             return (input_image,None)
-        
+
         if source_image is None and face_model is None:
             logger.error("Please provide `source_image` or `face_model`")
             return (input_image,None)
@@ -581,7 +583,7 @@ class ReActorWeight:
                         embeddings.append(face_model.embedding)
                 else:
                     images.append(input_image)
-        
+
         images_list: List[Image.Image] = []
 
         apply_patch(1)
@@ -598,7 +600,7 @@ class ReActorWeight:
                     continue
                 faces.append(face)
                 embeddings.append(face.embedding)
-        
+
         if len(faces) > 0:
             blended_embedding = np.mean(embeddings, axis=0)
             blended_face = Face(
@@ -960,9 +962,9 @@ class MaskHelper:
         swapped_rgba = core.tensor2rgba(swapped_image)
 
         mask_image_final = mask_blurred
-        
+
         # *** CUT BY MASK ***:
-    
+
         if len(swapped_image.shape) < 4:
             C = 1
         else:
@@ -1015,7 +1017,7 @@ class MaskHelper:
                 single = (swapped_image[i, ymin:ymax+1, xmin:xmax+1,:]).unsqueeze(0)
                 resized = torch.nn.functional.interpolate(single.permute(0, 3, 1, 2), size=(use_height, use_width), mode='bicubic').permute(0, 2, 3, 1)
                 cutted_image[i] = resized[0]
-        
+
         # Preserve our type unless we were previously RGB and added non-opaque alpha due to the mask size
         if C == 1:
             cutted_image = core.tensor2mask(cutted_image)
@@ -1068,7 +1070,7 @@ class MaskHelper:
 
         result = image_base.detach().clone()
         face_segment = mask_image_final
-        
+
         for i in range(0, MB):
             if is_empty[i]:
                 continue

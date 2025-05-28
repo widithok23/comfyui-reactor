@@ -1,3 +1,4 @@
+import time
 from transformers import pipeline
 from PIL import Image
 import io
@@ -30,11 +31,50 @@ def ensure_nsfw_model(nsfwdet_model_path):
     MODEL_EXISTS = True if downloaded == 3 else False
     return MODEL_EXISTS
 
-SCORE = 0.96
+SCORE = 0.96  # Default threshold
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
-def nsfw_image(img_data, model_path: str):
+def validate_nsfw_threshold(threshold: float) -> float:
+    """
+    Validate and normalize NSFW threshold parameter.
+
+    Args:
+        threshold: Threshold value to validate
+
+    Returns:
+        float: Validated threshold value
+
+    Raises:
+        ValueError: If threshold is outside valid range
+    """
+    if not isinstance(threshold, (int, float)):
+        raise ValueError(f"NSFW threshold must be a number, got {type(threshold)}")
+
+    threshold = float(threshold)
+
+    if threshold < 0.0 or threshold > 1.0:
+        raise ValueError(f"NSFW threshold must be between 0.0 and 1.0, got {threshold}")
+
+    return threshold
+
+def nsfw_image(img_data, model_path: str, threshold: float = 0.96):
+    """
+    Detect NSFW content in an image using a configurable threshold.
+
+    Args:
+        img_data: Image data as bytes
+        model_path: Path to the NSFW detection model
+        threshold: Detection threshold (0.0-1.0), default 0.96
+
+    Returns:
+        bool: True if NSFW content detected above threshold, False otherwise
+    """
+    start_time = time.time()
+
+    # Validate threshold parameter
+    threshold = validate_nsfw_threshold(threshold)
+
     if not MODEL_EXISTS:
         logger.status("Ensuring NSFW detection model exists...")
         if not ensure_nsfw_model(model_path):
@@ -48,8 +88,16 @@ def nsfw_image(img_data, model_path: str):
             if "cuda" in str(device):
                 device_id = int(str(device).split(":")[1])
             predict = pipeline("image-classification", model=model_path, device=device_id)
+
         result = predict(img)
-        if result[0]["label"] == "nsfw" and result[0]["score"] > SCORE:
-            logger.status(f'NSFW content detected with score={result[0]["score"]}, skipping...')
+        nsfw_score = result[0]["score"] if result[0]["label"] == "nsfw" else (1.0 - result[0]["score"])
+        is_nsfw = result[0]["label"] == "nsfw" and nsfw_score > threshold
+
+        detection_time = time.time() - start_time
+
+        logger.status(f'NSFW detection: score={nsfw_score:.3f}, threshold={threshold:.3f} - {"NSFW" if is_nsfw else "SFW"} ({detection_time:.2f}s)')
+
+        if is_nsfw:
+            logger.status(f'NSFW content detected with score={nsfw_score:.3f} (threshold: {threshold:.3f}), skipping...')
             return True
         return False
