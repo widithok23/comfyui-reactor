@@ -138,42 +138,46 @@ def sort_by_order(face, order: str):
         return sorted(face, key=lambda x: x.bbox[1], reverse = True)
     if order == "small-large":
         return sorted(face, key=lambda x: (x.bbox[2] - x.bbox[0]) * (x.bbox[3] - x.bbox[1]))
-    # if order == "large-small":
-    #     return sorted(face, key=lambda x: (x.bbox[2] - x.bbox[0]) * (x.bbox[3] - x.bbox[1]), reverse = True)
     # by default "large-small":
     return sorted(face, key=lambda x: (x.bbox[2] - x.bbox[0]) * (x.bbox[3] - x.bbox[1]), reverse = True)
 
 def get_face_gender(
-        face,
-        face_index,
-        gender_condition,
-        operated: str,
-        order: str,
+    face,
+    face_index,
+    gender_condition,
+    operated: str,
+    order: str,
 ):
-    gender = [
-        x.sex
-        for x in face
+    filtered_faces = [
+        f for f in face
+        if (gender_condition == 0) or
+        (gender_condition == 1 and f.sex == "F") or
+        (gender_condition == 2 and f.sex == "M")
     ]
-    gender.reverse()
-    # If index is outside of bounds, return None, avoid exception
-    if face_index >= len(gender):
-        logger.status("Requested face index (%s) is out of bounds (max available index is %s)", face_index, len(gender))
+
+    gender = "Female" if gender_condition == 1 else "Male" if gender_condition == 0 else ""
+
+    if len(filtered_faces) == 0:
+        if gender_condition != 0:
+            logger.status(f"No faces found for -{gender}-")
+        return None, 0  # treat as "wrong gender" to skip
+
+    faces_sorted = sort_by_order(filtered_faces, order)
+
+    if face_index >= len(faces_sorted):
+        logger.info("Requested face index (%s) is out of bounds (max available index is %s)", face_index, len(faces_sorted))
         return None, 0
-    face_gender = gender[face_index]
-    logger.status("%s Face %s: Detected Gender -%s-", operated, face_index, face_gender)
-    if (gender_condition == 1 and face_gender == "F") or (gender_condition == 2 and face_gender == "M"):
-        logger.status("OK - Detected Gender matches Condition")
-        try:
-            faces_sorted = sort_by_order(face, order)
-            return faces_sorted[face_index], 0
-            # return sorted(face, key=lambda x: x.bbox[0])[face_index], 0
-        except IndexError:
-            return None, 0
-    else:
-        logger.status("WRONG - Detected Gender doesn't match Condition")
-        faces_sorted = sort_by_order(face, order)
-        return faces_sorted[face_index], 1
-        # return sorted(face, key=lambda x: x.bbox[0])[face_index], 1
+
+    face_selected = faces_sorted[face_index]
+
+    logger.info("%s Face %s: Detected Gender -%s-", operated, face_index, face_selected.sex)
+
+    expected_gender = "F" if gender_condition == 1 else "M"
+    if gender_condition != 0 and face_selected.sex != expected_gender:
+        logger.info(f"{operated} Face {face_index}: WRONG gender ({face_selected.sex})")
+        return face_selected, 1  # <-- есть, но не тот пол
+
+    return face_selected, 0
 
 def half_det_size(det_size):
     logger.status("Trying to halve 'det_size' parameter")
@@ -376,7 +380,7 @@ def swap_face(
                             logger.status("Wrong target gender detected")
                             continue
                         else:
-                            logger.status(f"No target face found for {face_num}")
+                            logger.info(f"No target face found for {face_num}")
                     elif src_wrong_gender == 1:
                         src_wrong_gender = 0
                         # Keep searching for other faces if wrong gender is detected, enhancement
@@ -547,6 +551,7 @@ def swap_face_many(
 
                 pbar = progress_bar(len(target_imgs))
 
+                logger.status(f"Swapping...")
                 for face_num in faces_index:
                     # No use in trying to swap faces if no further faces are found, enhancement
                     if face_num >= len(target_faces):
@@ -559,7 +564,7 @@ def swap_face_many(
 
                     if source_face is not None and src_wrong_gender == 0:
                         # Reading results to make current face swap on a previous face result
-                        logger.status(f"Swapping...")
+                        # logger.status(f"Swapping...")
                         for i, (target_img, target_face) in enumerate(zip(results, target_faces)):
                             target_face_single, wrong_gender = get_face_single(target_img, target_face, face_index=face_num, gender_target=gender_target, order=faces_order[0])
                             if target_face_single is not None and wrong_gender == 0:
@@ -581,7 +586,7 @@ def swap_face_many(
                                 pbar.update(1)
                                 continue
                             else:
-                                logger.status(f"No target face found for {face_num}")
+                                logger.info(f"{i}: No target face found for {face_num}")
                                 pbar.update(1)
                     elif src_wrong_gender == 1:
                         src_wrong_gender = 0
