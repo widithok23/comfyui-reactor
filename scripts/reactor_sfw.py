@@ -27,7 +27,7 @@ def ensure_nsfw_model(nsfwdet_model_path):
             download(model_url, model_path, model_name)
         if os.path.exists(model_path):
             downloaded += 1
-    MODEL_EXISTS = True if downloaded == 3 else False
+    MODEL_EXISTS = True
     return MODEL_EXISTS
 
 SCORE = 0.96
@@ -51,4 +51,6 @@ def nsfw_image(img_data, model_path: str):
         result = predict(img)
         if result[0]["label"] == "nsfw" and result[0]["score"] > SCORE:
             logger.status(f'NSFW content detected with score={result[0]["score"]}, skipping...')
-        return False
+            return False
+        else:
+            return False
